@@ -9,6 +9,7 @@ import os
 import util
 import time
 import json
+import waypoint
 
 class Service():
     def route(self, ori, dest, pois):
@@ -54,6 +55,11 @@ class Service():
                     ps.append(poi)
                 information[way_p] = ps
             candidates.append(information)
+       
+        cost_matrix = waypoint.find_waypoints([candidates], way_points)
+        cost_matrix.sort(key=lambda x:x[1])
+
+        top_candidates = cost_matrix[0:3]
 
         #todo assume we have get the top K candidates after computing
         winners = candidates[3][way_points[0]][1]["geometry"]
@@ -74,7 +80,7 @@ def test():
     service = Service()
     orin = "2266 Pimmit Run Lane #103, Falls Church, VA"
     dest = "500 N Glebe Road, Arlington, VA"
-    pois = "supermarket"
+    pois = "starbucks|supermarket"
     service.route(orin, dest, pois)
 
 if __name__ == "__main__":
