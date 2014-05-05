@@ -12,6 +12,29 @@ import json
 import waypoint
 
 class Service():
+    
+    def get_direction(self, ori, dest, pois):
+        middle_points = pois[0]
+        start = ori
+        departure_time = int(time.time())
+        final_routes = []
+        for p in middle_points:
+            location = "%s,%s" % (p["geometry"]["location"]["lat"], p["geometry"]["location"]["lng"])
+            next_stop = location
+            routes = util.query_routes(origin=start,
+                    destination=next_stop,
+                    departure_time=departure_time)
+            if routes is not None and routes["status"] == "OK":
+                final_routes.append(routes["routes"][0])
+            start = location
+        last_routes = util.query_routes(origin=start,
+                destination=dest,
+                departure_time=departure_time)
+        if routes is not None and routes["status"] == "OK":
+            final_routes.append(routes["routes"][0])
+
+        return final_routes
+
     def route(self, ori, dest, pois):
         """
         Find the best route between ori and dest 
@@ -33,7 +56,6 @@ class Service():
         if points is None or len(points) ==0:
             print "Error in extracting points"
             return None
-        
         #get the candiates in the route
         candidates = []
         way_points = pois.split("|")
@@ -59,22 +81,12 @@ class Service():
         cost_matrix = waypoint.find_waypoints([candidates], way_points)
         cost_matrix.sort(key=lambda x:x[1])
 
-        top_candidates = cost_matrix[0:3]
+        top_candidate = cost_matrix[0]
+        json.dump(top_candidate, open('./top_candidate.json','w'))
+        final_route = self.get_direction(ori, dest, top_candidate)
+        json.dump(final_route, open("./real_route.json", "w"))
 
-        #todo assume we have get the top K candidates after computing
-        winners = candidates[3][way_points[0]][1]["geometry"]
-        winners = "%s,%s" % (winners["location"]["lat"], 
-                winners["location"]["lng"])
-        final_order = [ori, winners, dest]
-
-        final_routes = []
-        for i in range(len(final_order) - 1):
-            rs = util.query_routes(origin=final_order[i], 
-                    destination=final_order[i+1],
-                    departure_time=departure_time)
-            final_routes.append(rs)
-
-        json.dump(final_routes, open("./test_route_show.json", "w"))
+        return final_route
 
 def test():
     service = Service()
