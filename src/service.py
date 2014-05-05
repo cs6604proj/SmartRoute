@@ -30,8 +30,8 @@ class Service():
         last_routes = util.query_routes(origin=start,
                 destination=dest,
                 departure_time=departure_time)
-        if routes is not None and routes["status"] == "OK":
-            final_routes.append(routes["routes"][0])
+        if last_routes is not None and last_routes["status"] == "OK":
+            final_routes.append(last_routes["routes"][0])
 
         return final_routes
 
@@ -91,8 +91,8 @@ class Service():
 def test():
     service = Service()
     orin = "2266 Pimmit Run Lane #103, Falls Church, VA"
-    dest = "500 N Glebe Road, Arlington, VA"
-    pois = "starbucks|supermarket"
+    dest = "900 N Glebe Road, Arlington, VA"
+    pois = "The greene turtle"
     service.route(orin, dest, pois)
 
 if __name__ == "__main__":
