@@ -25,6 +25,7 @@ class Service():
                     destination=next_stop,
                     departure_time=departure_time)
             if routes is not None and routes["status"] == "OK":
+                routes["routes"][0]
                 final_routes.append(routes["routes"][0])
             start = location
         last_routes = util.query_routes(origin=start,
@@ -46,13 +47,14 @@ class Service():
                 destination=dest,
                 departure_time=departure_time)
         if routes is None or routes['status'] != "OK":
+            print ',=====',routes
             return None
 
         route = routes["routes"][0]  #get the first route
 
         #get the points in the route to search the potential poi
         points = util.extract_points(route)
-        
+
         if points is None or len(points) ==0:
             print "Error in extracting points"
             return None
@@ -86,13 +88,13 @@ class Service():
         final_route = self.get_direction(ori, dest, top_candidate)
         json.dump(final_route, open("./real_route.json", "w"))
 
-        return final_route
+        return final_route, top_candidate
 
 def test():
     service = Service()
     orin = "2266 Pimmit Run Lane #103, Falls Church, VA"
     dest = "900 N Glebe Road, Arlington, VA"
-    pois = "The greene turtle"
+    pois = "Starbucks|supermarket"
     service.route(orin, dest, pois)
 
 if __name__ == "__main__":

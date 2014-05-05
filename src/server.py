@@ -26,12 +26,13 @@ class SearchHandler(tornado.web.RequestHandler):
         else:
             #todo fetch actual route
             servi = service.Service()
-            routes = servi.route(origin, dest, pois)
+            routes, best_pois = servi.route(origin, dest, pois)
             if routes is None:
                 response = {'status': "ERROR"}
             else:
                 response = {'status': "OK",
-                        "routes": routes}
+                        "routes": routes,
+                        "pois": best_pois}
             self.write(response)
 
 
